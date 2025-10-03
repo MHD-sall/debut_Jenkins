@@ -6,7 +6,7 @@ pipeline {
     }
 
     environment {
-        DOCKER_HUB_USER = 'mhd0'
+        DOCKER_HUB_USER = 'sall889'
         FRONT_IMAGE = 'react-frontend'
         BACK_IMAGE  = 'express-backend'
     }
@@ -28,7 +28,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/mhdgeek/express_mongo_react.git'
+                git branch: 'main', url: ' https://github.com/MHD-sall/debut_Jenkins.git'
             }
         }
 
@@ -123,14 +123,14 @@ pipeline {
             emailext(
                 subject: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "Pipeline réussi\nDétails : ${env.BUILD_URL}",
-                to: "mohamedndoye07@gmail.com"
+                to: "methzosll889@gmail.com"
             )
         }
         failure {
             emailext(
                 subject: "Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "Le pipeline a échoué\nDétails : ${env.BUILD_URL}",
-                to: "mohamedndoye07@gmail.com"
+                to: "methzosll889@gmail.com"
             )
         }
     }
