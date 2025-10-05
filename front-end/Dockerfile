@@ -7,7 +7,7 @@ COPY package*.json ./
 COPY vite.config.js ./
 
 # Installer toutes les dépendances (dont devDependencies)
-
+RUN npm install
 
 # Copier le code source
 COPY . .
