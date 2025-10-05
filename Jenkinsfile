@@ -32,10 +32,10 @@ pipeline {
             }
         }
 
-        stage('Install dependencies - Backend') {
+        stage('Install dependencies - Backend') 
             steps {
                 dir('back-end') {
-                    sh 'npm insta'
+                    sh 'npm install'
                 }
             }
         }
