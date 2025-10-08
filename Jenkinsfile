@@ -56,7 +56,33 @@ pipeline {
                 }
             }
         }
+        
+        stage('SonarQube Analysis') {
+            environment {
+                SCANNER_HOME = tool 'SonarQubeScanner' // Nom configuré dans Jenkins > Global Tool Configuration
+            }
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh '''
+                        $SCANNER_HOME/bin/sonar-scanner \
+                        -Dsonar.projectKey=debut_Jenkins \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=$SONAR_HOST_URL \
+                        -Dsonar.login=$SONAR_AUTH_TOKEN \
+                        -Dsonar.exclusions=**/node_modules/**,**/tests/**
+                    '''
+                }
+            }
+        }
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 1, unit: 'HOURS') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
 
+        
         stage('Build Docker Images') {
             steps {
                 script {
