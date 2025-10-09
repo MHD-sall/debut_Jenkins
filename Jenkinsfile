@@ -57,7 +57,7 @@ pipeline {
             }
         }
         
-        stage('SonarQube Analysis') {
+        stage('SonarQube Analysis') { //analyse du code
             environment {
                 SCANNER_HOME = tool 'SonarScanner' // Nom configuré dans Jenkins > Global Tool Configuration
             }
