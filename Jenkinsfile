@@ -59,7 +59,7 @@ pipeline {
         
         stage('SonarQube Analysis') {
             environment {
-                SCANNER_HOME = tool 'SonarQubeScanner' // Nom configuré dans Jenkins > Global Tool Configuration
+                SCANNER_HOME = tool 'SonarScanner' // Nom configuré dans Jenkins > Global Tool Configuration
             }
             steps {
                 withSonarQubeEnv('SonarQube') {
@@ -68,7 +68,7 @@ pipeline {
                         -Dsonar.projectKey=debut_Jenkins \
                         -Dsonar.sources=. \
                         -Dsonar.host.url=$SONAR_HOST_URL \
-                        -Dsonar.login=$SONAR_AUTH_TOKEN \
+                        -Dsonar.login=$squ_37a119a35601b00a751f5abeabce39a09d4a4363 \
                         -Dsonar.exclusions=**/node_modules/**,**/tests/**
                     '''
                 }
