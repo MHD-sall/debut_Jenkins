@@ -68,7 +68,7 @@ pipeline {
                         $SCANNER_HOME/bin/sonar-scanner \
                         -Dsonar.projectKey=debut_Jenkins \
                         -Dsonar.sources=.front-end,back-end \
-                        -Dsonar.host.url=http://localhost:9000 \
+                        -Dsonar.host.url=http://172.22.0.1:9000 \
                         -Dsonar.login=$SONAR_AUTO \
                         -Dsonar.exclusions=**/node_modules/**,**/tests/**
                     '''
