@@ -57,24 +57,26 @@ pipeline {
             }
         }
         
-        stage('SonarQube Analysis') { //analyse du code
-            environment {
-                withCredentials([string(credentialId: 'sonar', variable: 'SONAR_AUTO')])
-                SCANNER_HOME = tool 'SonarScanner' // Nom configuré dans Jenkins > Global Tool Configuration
-            }
-            steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh '''
-                        $SCANNER_HOME/bin/sonar-scanner \
+        stage('SonarQube Analysis') {
+    steps {
+        withSonarQubeEnv('SonarQube') {
+            withCredentials([string(credentialsId: 'sonar', variable: 'SONAR_AUTO')]) {
+                script {
+                    def scannerHome = tool 'SonarScanner'
+                    sh """
+                        ${scannerHome}/bin/sonar-scanner \
                         -Dsonar.projectKey=debut_Jenkins \
-                        -Dsonar.sources=.front-end,back-end \
+                        -Dsonar.sources=front-end,back-end \
                         -Dsonar.host.url=http://172.22.0.1:9000 \
-                        -Dsonar.login=$SONAR_AUTO \
+                        -Dsonar.login=${SONAR_AUTO} \
                         -Dsonar.exclusions=**/node_modules/**,**/tests/**
-                    '''
+                    """
                 }
             }
         }
+    }
+}
+
         stage('Quality Gate') {
             steps {
                 timeout(time: 1, unit: 'HOURS') {
