@@ -4,8 +4,7 @@ pipeline {
     tools {
        
     nodejs "NodeJS_16"
-    sonarQubeScanner "SonarQubeScanner"
-
+   hudson.plugins.sonar.SonarRunnerInstallation "SonarQubeScanner"
 
     }
     environment {
