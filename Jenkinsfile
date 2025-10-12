@@ -4,7 +4,9 @@ pipeline {
     tools {
         nodejs "NodeJS_16"
     }
-
+ tools {
+        sonarQubeScanner 'SonarQubeScanner' // le nom exact défini dans Jenkins
+    }
     environment {
         DOCKER_HUB_USER = 'sall889'
         FRONT_IMAGE = 'react-frontend'
