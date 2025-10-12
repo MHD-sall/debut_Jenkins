@@ -2,10 +2,11 @@ pipeline {
     agent any
 
     tools {
-        nodejs "NodeJS_16"
-    }
- tools {
-        sonarQubeScanner 'SonarQubeScanner' // le nom exact défini dans Jenkins
+       
+    nodejs "NodeJS_16"
+    sonarQubeScanner "SonarQubeScanner"
+
+
     }
     environment {
         DOCKER_HUB_USER = 'sall889'
