@@ -2,16 +2,17 @@ pipeline {
     agent any
 
     tools {
-       
-    nodejs "NodeJS_16"
-   hudson.plugins.sonar.SonarRunnerInstallation "SonarQubeScanner"
-
+        nodejs "NodeJS_16"
+        // ❌ Supprimé : hudson.plugins.sonar.SonarRunnerInstallation "SonarQubeScanner"
+        // ✅ SonarQube sera géré plus bas via withSonarQubeEnv()
     }
+
     environment {
         DOCKER_HUB_USER = 'sall889'
         FRONT_IMAGE = 'react-frontend'
         BACK_IMAGE  = 'express-backend'
     }
+
     triggers {
         // Pour que le pipeline démarre quand le webhook est reçu
         GenericTrigger(
@@ -30,7 +31,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: ' https://github.com/MHD-sall/debut_Jenkins.git'
+                git branch: 'main', url: 'https://github.com/MHD-sall/debut_Jenkins.git'
             }
         }
 
@@ -58,22 +59,21 @@ pipeline {
                 }
             }
         }
-        
-        stage('SonarQube Analysis') {
-    steps {
-        withCredentials([string(credentialsId: 'sonar', variable: 'sonar')]) {
-            sh '''
-                sonar-scanner \
-                    -Dsonar.projectKey=debut_Jenkins \
-                    -Dsonar.sources=front-end,back-end \
-                    -Dsonar.host.url=http://172.22.0.1:9000 \
-                    -Dsonar.token=$sonar \
-                    -Dsonar.exclusions=**/node_modules/**,**/tests/**
-            '''
-        }
-    }
-}
 
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {  // ✅ nom du serveur Sonar configuré dans Jenkins
+                    sh '''
+                        sonar-scanner \
+                            -Dsonar.projectKey=debut_Jenkins \
+                            -Dsonar.sources=front-end,back-end \
+                            -Dsonar.host.url=$SONAR_HOST_URL \
+                            -Dsonar.login=$SONAR_AUTH_TOKEN \
+                            -Dsonar.exclusions=**/node_modules/**,**/tests/**
+                    '''
+                }
+            }
+        }
 
         stage('Quality Gate') {
             steps {
@@ -83,7 +83,6 @@ pipeline {
             }
         }
 
-        
         stage('Build Docker Images') {
             steps {
                 script {
@@ -105,7 +104,6 @@ pipeline {
             }
         }
 
-        // on supprime les conteneur inactif dans docker container
         stage('Clean Docker') {
             steps {
                 sh 'docker container prune -f'
@@ -122,7 +120,7 @@ pipeline {
 
         stage('Deploy (compose.yaml)') {
             steps {
-                dir('.') {  
+                dir('.') {
                     sh 'docker-compose -f compose.yaml down || true'
                     sh 'docker-compose -f compose.yaml pull'
                     sh 'docker-compose -f compose.yaml up -d'
