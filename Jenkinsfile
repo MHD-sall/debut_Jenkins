@@ -64,7 +64,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube') {  //  nom du serveur Sonar configuré dans Jenkins
                     sh '''
-                        sonar-scanner \
+                        opt/sonar-scanner/bin/sonar-scanner \
                             -Dsonar.projectKey=debut_Jenkins \
                             -Dsonar.sources=front-end,back-end \
                             -Dsonar.host.url=$SONAR_HOST_URL \
