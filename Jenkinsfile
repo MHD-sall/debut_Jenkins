@@ -1,18 +1,16 @@
-pipeline {
-    agent any
+ agent any
 
     tools {
-        nodejs "NodeJS_16"
-        // ❌ Supprimé : hudson.plugins.sonar.SonarRunnerInstallation "SonarQubeScanner"
-        // ✅ SonarQube sera géré plus bas via withSonarQubeEnv()
-    }
+       
+    nodejs "NodeJS_16"
+   
 
+    }
     environment {
         DOCKER_HUB_USER = 'sall889'
         FRONT_IMAGE = 'react-frontend'
         BACK_IMAGE  = 'express-backend'
     }
-
     triggers {
         // Pour que le pipeline démarre quand le webhook est reçu
         GenericTrigger(
@@ -31,7 +29,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/MHD-sall/debut_Jenkins.git'
+                git branch: 'main', url: ' https://github.com/MHD-sall/debut_Jenkins.git'
             }
         }
 
@@ -59,10 +57,10 @@ pipeline {
                 }
             }
         }
-
+        
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {  // ✅ nom du serveur Sonar configuré dans Jenkins
+                withSonarQubeEnv('SonarQube') {  //  nom du serveur Sonar configuré dans Jenkins
                     sh '''
                         sonar-scanner \
                             -Dsonar.projectKey=debut_Jenkins \
@@ -75,6 +73,8 @@ pipeline {
             }
         }
 
+
+
         stage('Quality Gate') {
             steps {
                 timeout(time: 1, unit: 'HOURS') {
@@ -83,6 +83,7 @@ pipeline {
             }
         }
 
+        
         stage('Build Docker Images') {
             steps {
                 script {
@@ -104,6 +105,7 @@ pipeline {
             }
         }
 
+        // on supprime les conteneur inactif dans docker container
         stage('Clean Docker') {
             steps {
                 sh 'docker container prune -f'
@@ -120,7 +122,7 @@ pipeline {
 
         stage('Deploy (compose.yaml)') {
             steps {
-                dir('.') {
+                dir('.') {  
                     sh 'docker-compose -f compose.yaml down || true'
                     sh 'docker-compose -f compose.yaml pull'
                     sh 'docker-compose -f compose.yaml up -d'
