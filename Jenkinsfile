@@ -1,16 +1,18 @@
- agent any
+pipeline {
+    agent any
 
     tools {
+        nodejs "NodeJS_16"
        
-    nodejs "NodeJS_16"
-   
-
+        // ✅ SonarQube sera géré plus bas via withSonarQubeEnv()
     }
+
     environment {
         DOCKER_HUB_USER = 'sall889'
         FRONT_IMAGE = 'react-frontend'
         BACK_IMAGE  = 'express-backend'
     }
+
     triggers {
         // Pour que le pipeline démarre quand le webhook est reçu
         GenericTrigger(
@@ -29,7 +31,7 @@
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: ' https://github.com/MHD-sall/debut_Jenkins.git'
+                git branch: 'main', url: 'https://github.com/MHD-sall/debut_Jenkins.git'
             }
         }
 
@@ -57,7 +59,7 @@
                 }
             }
         }
-        
+
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {  //  nom du serveur Sonar configuré dans Jenkins
@@ -73,8 +75,6 @@
             }
         }
 
-
-
         stage('Quality Gate') {
             steps {
                 timeout(time: 1, unit: 'HOURS') {
@@ -83,7 +83,6 @@
             }
         }
 
-        
         stage('Build Docker Images') {
             steps {
                 script {
@@ -105,7 +104,6 @@
             }
         }
 
-        // on supprime les conteneur inactif dans docker container
         stage('Clean Docker') {
             steps {
                 sh 'docker container prune -f'
@@ -122,7 +120,7 @@
 
         stage('Deploy (compose.yaml)') {
             steps {
-                dir('.') {  
+                dir('.') {
                     sh 'docker-compose -f compose.yaml down || true'
                     sh 'docker-compose -f compose.yaml pull'
                     sh 'docker-compose -f compose.yaml up -d'
