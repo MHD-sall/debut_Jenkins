@@ -2,7 +2,7 @@ import axios from 'axios'
 
 // Configuration pour Docker - utilise l'URL de l'environnement ou une valeur par défaut
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
-
+const ()
 console.log('API Base URL:', API_BASE_URL)
 
 const api = axios.create({
