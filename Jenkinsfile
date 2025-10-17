@@ -60,29 +60,7 @@ pipeline {
             }
         }
 
-       /* stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube') {  //  nom du serveur Sonar configuré dans Jenkins
-                    sh '''
-                        opt/sonar-scanner/bin/sonar-scanner \
-                            -Dsonar.projectKey=debut_Jenkins \
-                            -Dsonar.sources=front-end,back-end \
-                            -Dsonar.host.url=$SONAR_HOST_URL \
-                            -Dsonar.login=$SONAR_AUTH_TOKEN \
-                            -Dsonar.exclusions=**/node_modules/**,**/tests/**
-                    '''
-                }
-            }
-        }
-
-        stage('Quality Gate') {
-            steps {
-                timeout(time: 1, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
-*/
+     
         stage('Build Docker Images') {
             steps {
                 script {
