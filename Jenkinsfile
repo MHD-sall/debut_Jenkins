@@ -3,22 +3,19 @@ pipeline {
 
     tools {
         nodejs "NodeJS_22"
-       
-        // ✅ SonarQube sera géré plus bas via withSonarQubeEnv()
     }
 
     environment {
         DOCKER_HUB_USER = 'sall889'
         FRONT_IMAGE = 'react-frontend'
         BACK_IMAGE  = 'express-backend'
-         SONARQUBE_ENV = 'SonarQube'        // Nom de l'instance SonarQube dans Jenkins
-        SCANNER_TOOL = 'sonar-scanner'       // Nom du scanner configuré dans Jenkins
-        SONAR_HOST_URL = 'http://localhost:9000' // URL de ton SonarQube
-        SONAR_AUTH_TOKEN = credentials('sonar') // Token SonarQube stocké dans Jenkins
+        SONARQUBE_ENV = 'SonarQube'
+        SCANNER_TOOL = 'sonar-scanner'
+        SONAR_HOST_URL = 'http://localhost:9000'
+        SONAR_AUTH_TOKEN = credentials('sonar')
     }
 
     triggers {
-        // Pour que le pipeline démarre quand le webhook est reçu
         GenericTrigger(
             genericVariables: [
                 [key: 'ref', value: '$.ref'],
@@ -38,7 +35,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/MHD-sall/debut_Jenkins.git'
             }
         }
-    }
+
         stage('Install dependencies - Backend') {
             steps {
                 dir('back-end') {
@@ -63,36 +60,34 @@ pipeline {
                 }
             }
         }
-// ======================== SonarQube ========================
-        stage('SonarQube Analysis') {
-    steps {
-        script {
-            echo "Analyse du code avec SonarQube"
-      withCredentials([string(credentialsId: 'sonar', variable: 'SONAR_TOKEN')]) {
-    sh """
-    export SONAR_TOKEN=${SONAR_TOKEN}
-    ${scannerHome}/bin/sonar-scanner \
-    -Dsonar.projectKey=debut_Jenkins \
-    -Dsonar.projectName="debut_Jenkins" \
-    -Dsonar.sources=. \
-    -Dsonar.host.url=http://localhost:9000
-    """
-}
 
+        // ======================== SonarQube ========================
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    echo "Analyse du code avec SonarQube"
+                    withCredentials([string(credentialsId: 'sonar', variable: 'SONAR_TOKEN')]) {
+                        sh """
+                            export SONAR_TOKEN=${SONAR_TOKEN}
+                            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=debut_Jenkins \
+                            -Dsonar.projectName="debut_Jenkins" \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=http://localhost:9000
+                        """
+                    }
+                }
             }
         }
-    }
 
-
-stage('Quality Gate') {
-    steps {
-        echo "🛡️ Vérification du Quality Gate..."
-        timeout(time: 2, unit: 'MINUTES') {
-            waitForQualityGate abortPipeline: true
+        stage('Quality Gate') {
+            steps {
+                echo "🛡️ Vérification du Quality Gate..."
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
         }
-    }
-}
-
 
         stage('Build Docker Images') {
             steps {
@@ -160,8 +155,8 @@ stage('Quality Gate') {
                 subject: "Build SUCCESS: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "Pipeline réussi\nDétails : ${env.BUILD_URL}",
                 to: 'methzosll889@gmail.com',
-                from:'methzosll889@gmail.com',
-                replyTo:'methzosll889@gmail.com'
+                from: 'methzosll889@gmail.com',
+                replyTo: 'methzosll889@gmail.com'
             )
         }
         failure {
@@ -169,9 +164,10 @@ stage('Quality Gate') {
                 subject: "Build FAILED: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                 body: "Le pipeline a échoué\nDétails : ${env.BUILD_URL}",
                 to: 'methzosll889@gmail.com',
-                from:'methzosll889@gmail.com',
-                replyTo:'methzosll889@gmail.com'
+                from: 'methzosll889@gmail.com',
+                replyTo: 'methzosll889@gmail.com'
             )
         }
     }
+}
 
