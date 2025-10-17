@@ -68,18 +68,17 @@ pipeline {
     steps {
         script {
             echo "Analyse du code avec SonarQube"
-            withSonarQubeEnv("SonarQube") {
-                def scannerHome = tool name: "sonar-scanner", type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                withCredentials([string(credentialsId: 'sonar', variable: 'SONAR_TOKEN')]) {
-                    sh """
-                    export SONAR_TOKEN=${SONAR_TOKEN}
-                    ${scannerHome}/bin/sonar-scanner \
-                    -Dsonar.projectKey=debut_Jenkins \
-                    -Dsonar.projectName="debut_Jenkins" \
-                    -Dsonar.sources=. \
-                    -Dsonar.host.url=http://localhost:9000
-                    """
-                }
+          withCredentials([string(credentialsId: 'sonar', variable: 'SONAR_TOKEN')]) {
+    sh """
+    export SONAR_TOKEN=${SONAR_TOKEN}
+    ${scannerHome}/bin/sonar-scanner \
+    -Dsonar.projectKey=debut_Jenkins \
+    -Dsonar.projectName="debut_Jenkins" \
+    -Dsonar.sources=. \
+    -Dsonar.host.url=http://localhost:9000
+    """
+}
+
             }
         }
     }
