@@ -11,6 +11,10 @@ pipeline {
         DOCKER_HUB_USER = 'sall889'
         FRONT_IMAGE = 'react-frontend'
         BACK_IMAGE  = 'express-backend'
+         SONARQUBE_ENV = 'SonarQube'        // Nom de l'instance SonarQube dans Jenkins
+        SCANNER_TOOL = 'sonar-scanner'       // Nom du scanner configuré dans Jenkins
+        SONAR_HOST_URL = 'http://localhost:9000' // URL de ton SonarQube
+        SONAR_AUTH_TOKEN = credentials('sonar') // Token SonarQube stocké dans Jenkins
     }
 
     triggers {
@@ -59,7 +63,41 @@ pipeline {
                 }
             }
         }
+// ======================== SonarQube ========================
+        stage('SonarQube Analysis') {
+            steps {
+                script {
+                    echo "Analyse du code avec SonarQube"
+                    withSonarQubeEnv("SonarQube") {
+                        def scannerHome = tool name: "sonar-scanner", type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                        sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=debut_Jenkins \
+                        -Dsonar.projectName="debut_Jenkins" \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=http://localhost:9000 \
+                        -Dsonar.login=sonar
+                        """
+                    }
+                }
+            }
+        }
 
+        stage('Quality Gate') {
+            steps {
+                script {
+                    timeout(time: 3, unit: 'MINUTES') {
+                        def qg = waitForQualityGate()
+                        echo "Quality Gate status: ${qg.status}"
+                        if (qg.status != 'OK') {
+                            error "❌ Build stopped — Quality Gate failed (${qg.status})"
+                        } else {
+                            echo "✅ Quality Gate passed!"
+                        }
+                    }
+                }
+            }
+        }
      
         stage('Build Docker Images') {
             steps {
