@@ -65,40 +65,43 @@ pipeline {
         }
 // ======================== SonarQube ========================
         stage('SonarQube Analysis') {
-            steps {
-                script {
-                    echo "Analyse du code avec SonarQube"
-                    withSonarQubeEnv("SonarQube") {
-                        def scannerHome = tool name: "sonar-scanner", type: 'hudson.plugins.sonar.SonarRunnerInstallation'
-                        sh """
-                        ${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=debut_Jenkins \
-                        -Dsonar.projectName="debut_Jenkins" \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=http://localhost:9000 \
-                        -Dsonar.login=sonar
-                        """
-                    }
+    steps {
+        script {
+            echo "Analyse du code avec SonarQube"
+            withSonarQubeEnv("SonarQube") {
+                def scannerHome = tool name: "sonar-scanner", type: 'hudson.plugins.sonar.SonarRunnerInstallation'
+                // Récupération du token SonarQube depuis les credentials Jenkins
+                withCredentials([string(credentialsId: 'sonar_db', variable: 'SONAR_TOKEN')]) {
+                    sh """
+                    export SONAR_TOKEN=${SONAR_TOKEN}
+                    ${scannerHome}/bin/sonar-scanner \
+                    -Dsonar.projectKey=debut_Jenkins \
+                    -Dsonar.projectName="debut_Jenkins" \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=http://localhost:9000
+                    """
                 }
             }
         }
+    }
+}
 
-        stage('Quality Gate') {
-            steps {
-                script {
-                    timeout(time: 3, unit: 'MINUTES') {
-                        def qg = waitForQualityGate()
-                        echo "Quality Gate status: ${qg.status}"
-                        if (qg.status != 'OK') {
-                            error "❌ Build stopped — Quality Gate failed (${qg.status})"
-                        } else {
-                            echo "✅ Quality Gate passed!"
-                        }
-                    }
+stage('Quality Gate') {
+    steps {
+        script {
+            timeout(time: 3, unit: 'MINUTES') {
+                def qg = waitForQualityGate()
+                echo "Quality Gate status: ${qg.status}"
+                if (qg.status != 'OK') {
+                    error "❌ Build stopped — Quality Gate failed (${qg.status})"
+                } else {
+                    echo "✅ Quality Gate passed!"
                 }
             }
         }
-     
+    }
+}
+
         stage('Build Docker Images') {
             steps {
                 script {
