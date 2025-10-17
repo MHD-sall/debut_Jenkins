@@ -174,4 +174,4 @@ stage('Quality Gate') {
             )
         }
     }
-}
+
