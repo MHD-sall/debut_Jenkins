@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     tools {
-        nodejs "NodeJS_16"
+        nodejs "NodeJS_22"
        
         // ✅ SonarQube sera géré plus bas via withSonarQubeEnv()
     }
