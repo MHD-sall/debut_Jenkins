@@ -85,13 +85,14 @@ pipeline {
 }
 
 stage('Quality Gate') {
-steps {
-echo "🛡️ Vérification du Quality Gate..."
-timeout(time: 2, unit: 'MINUTES') {
-waitForQualityGate abortPipeline: true
+    steps {
+        echo "🛡️ Vérification du Quality Gate..."
+        timeout(time: 2, unit: 'MINUTES') {
+            waitForQualityGate abortPipeline: true
+        }
+    }
 }
-}
-}
+
 
         stage('Build Docker Images') {
             steps {
