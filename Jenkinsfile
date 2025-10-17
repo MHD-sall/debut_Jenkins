@@ -71,7 +71,7 @@ pipeline {
             withSonarQubeEnv("SonarQube") {
                 def scannerHome = tool name: "sonar-scanner", type: 'hudson.plugins.sonar.SonarRunnerInstallation'
                 // Récupération du token SonarQube depuis les credentials Jenkins
-                withCredentials([string(credentialsId: 'sonar_db', variable: 'SONAR_TOKEN')]) {
+                withCredentials([string(credentialsId: 'sonar', variable: 'SONAR_TOKEN')]) {
                     sh """
                     export SONAR_TOKEN=${SONAR_TOKEN}
                     ${scannerHome}/bin/sonar-scanner \
