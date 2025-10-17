@@ -64,6 +64,10 @@ pipeline {
             }
         }
 // ======================== SonarQube ========================
+        stage('SonarQube Analysis') {
+    steps {
+        script {
+            echo "Analyse du code avec SonarQube"
       withCredentials([string(credentialsId: 'sonar', variable: 'SONAR_TOKEN')]) {
     sh """
     export SONAR_TOKEN=${SONAR_TOKEN}
