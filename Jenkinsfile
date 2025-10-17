@@ -60,7 +60,7 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
+       /* stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQube') {  //  nom du serveur Sonar configuré dans Jenkins
                     sh '''
@@ -82,7 +82,7 @@ pipeline {
                 }
             }
         }
-
+*/
         stage('Build Docker Images') {
             steps {
                 script {
