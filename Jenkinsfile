@@ -38,7 +38,7 @@ pipeline {
                 git branch: 'main', url: 'https://github.com/MHD-sall/debut_Jenkins.git'
             }
         }
-
+    }
         stage('Install dependencies - Backend') {
             steps {
                 dir('back-end') {
@@ -82,7 +82,7 @@ pipeline {
             }
         }
     }
-}
+
 
 stage('Quality Gate') {
     steps {
