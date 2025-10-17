@@ -63,35 +63,31 @@ pipeline {
 
         // ======================== SonarQube ========================
         stage('SonarQube Analysis') {
-    steps {
-        script {
-            // 🔹 Récupérer le chemin du scanner
-            def scannerHome = tool 'SonarQubeScanner' 
-
-            // 🔹 Définir l'environnement SonarQube
-            withSonarQubeEnv('sonar') {
-                sh """
-                    ${scannerHome}/bin/sonar-scanner \
-                    -Dsonar.projectKey=MonProjet \
-                    -Dsonar.sources=. \
-                    -Dsonar.host.url=http://localhost:9000 \
-                    -Dsonar.login=admin \
-                    -Dsonar.password=admin
-                """
+            steps {
+                script {
+                    echo "Analyse du code avec SonarQube"
+                    withCredentials([string(credentialsId: 'sonar', variable: 'SONAR_TOKEN')]) {
+                        sh """
+                            export SONAR_TOKEN=${SONAR_TOKEN}
+                            ${scannerHome}/bin/sonar-scanner \
+                            -Dsonar.projectKey=debut_Jenkins \
+                            -Dsonar.projectName="debut_Jenkins" \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=http://localhost:9000
+                        """
+                    }
+                }
             }
         }
-    }
-}
 
-stage('Quality Gate') {
-    steps {
-        echo "🛡️ Vérification du Quality Gate..."
-        timeout(time: 2, unit: 'MINUTES') {
-            waitForQualityGate abortPipeline: true
+        stage('Quality Gate') {
+            steps {
+                echo "🛡️ Vérification du Quality Gate..."
+                timeout(time: 2, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
         }
-    }
-}
-
 
         stage('Build Docker Images') {
             steps {
