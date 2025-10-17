@@ -63,22 +63,28 @@ pipeline {
 
         // ======================== SonarQube ========================
         stage('SonarQube Analysis') {
-            steps {
-                script {
-                    echo "Analyse du code avec SonarQube"
-                    withCredentials([string(credentialsId: 'sonar', variable: 'SONAR_TOKEN')]) {
-                        sh """
-                            export SONAR_TOKEN=${SONAR_TOKEN}
-                            ${scannerHome}/bin/sonar-scanner \
-                            -Dsonar.projectKey=debut_Jenkins \
-                            -Dsonar.projectName="debut_Jenkins" \
-                            -Dsonar.sources=. \
-                            -Dsonar.host.url=http://localhost:9000
-                        """
-                    }
-                }
+    steps {
+        script {
+            echo "🔍 Analyse du code avec SonarQube"
+
+            // 🔹 Définir scannerHome avant de l’utiliser
+            def scannerHome = tool 'sonar-scanner'
+
+            // 🔹 Utiliser le serveur SonarQube configuré dans Jenkins
+            withSonarQubeEnv('SonarQube') {
+                sh """
+                    ${scannerHome}/bin/sonar-scanner \
+                    -Dsonar.projectKey=debut_Jenkins \
+                    -Dsonar.projectName="debut_Jenkins" \
+                    -Dsonar.sources=. \
+                    -Dsonar.host.url=$SONAR_HOST_URL \
+                    -Dsonar.login=$SONAR_AUTH_TOKEN
+                """
             }
         }
+    }
+}
+
 
         stage('Quality Gate') {
             steps {
